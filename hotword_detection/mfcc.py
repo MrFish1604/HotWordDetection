@@ -40,7 +40,7 @@ class MFCC:
 	def generate_filter_bank(self, num_filters=23, lower_freq=300, upper_freq=3800):
 		"""
 		This function computes the Mel filterbank. The filters are stored in rows, the columns correspond
-    		to DFT bins. The filters are returned as a matrix of size nfilt * (nfft/2 + 1)
+			to DFT bins. The filters are returned as a matrix of size nfilt * (nfft/2 + 1)
 
 		:param num_filters: Number of filters in the Mel filterbank
 		:type num_filters: int
@@ -51,22 +51,22 @@ class MFCC:
 		:returns: Matrix containing filterbank weights
 		:rtype: matrix
 
-    		"""
-    		self.highfreq = upper_freq
-    		assert self.highfreq <= self.fs/2, "highfreq is greater than samplerate/2"
-    
-    		# compute points evenly spaced in mels
-    		self.lowmel = self.hz2mel(lower_freq)
-    		self.highmel = self.hz2mel(upper_freq)
-    		self.melpoints = np.linspace(self.lowmel,self.highmel,num_filters+2)
-    		self.bin = np.floor((self.N+1)*self.mel2hz(self.melpoints)/self.fs)
+			"""
+		self.highfreq = upper_freq
+		assert self.highfreq <= self.fs/2, "highfreq is greater than samplerate/2"
+	
+		# compute points evenly spaced in mels
+		self.lowmel = self.hz2mel(lower_freq)
+		self.highmel = self.hz2mel(upper_freq)
+		self.melpoints = np.linspace(self.lowmel,self.highmel,num_filters+2)
+		self.bin = np.floor((self.N+1)*self.mel2hz(self.melpoints)/self.fs)
 
 		self.fbank = np.zeros([num_filters,self.N/2+1])
-    		for j in range(0,num_filters):
-        		for i in range(int(self.bin[j]), int(self.bin[j+1])):
-            			self.fbank[j,i] = (i - self.bin[j]) / (self.bin[j+1]-self.bin[j])
-        		for i in range(int(self.bin[j+1]), int(self.bin[j+2])):
-            			self.fbank[j,i] = (self.bin[j+2]-i) / (self.bin[j+2]-self.bin[j+1])
+		for j in range(0,num_filters):
+			for i in range(int(self.bin[j]), int(self.bin[j+1])):
+				self.fbank[j,i] = (i - self.bin[j]) / (self.bin[j+1]-self.bin[j])
+			for i in range(int(self.bin[j+1]), int(self.bin[j+2])):
+				self.fbank[j,i] = (self.bin[j+2]-i) / (self.bin[j+2]-self.bin[j+1])
 		return self.fbank
 		
 		
@@ -74,13 +74,13 @@ class MFCC:
 		"""
 		Function for converting frequency in Hertz to Mel scale
 		"""
-    		return 2595 * np.log10(1+hz/700.0)
-    
+		return 2595 * np.log10(1+hz/700.0)
+	
 	def mel2hz(self, mel):
 		"""
 		Function for converting frequency in Mel scale to Hertz		
 		"""
-    		return 700*(10**(mel/2595.0)-1)
+		return 700*(10**(mel/2595.0)-1)
 	
 	def compute_mfcc(self, input_frame, include_dc=False):
 		"""

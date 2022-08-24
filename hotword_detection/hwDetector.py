@@ -83,9 +83,9 @@ class hwDetector:
 		This function computes the mean of the calculated DTW distances and returns a True value if mean distance is less than a specified threshold. If mean distance is greater than threshold it returns False indicating absence of hotword.
 
 		:param fileName: Name of test utterance .wav file
-                :type fileName: str
-                :returns: True/False to indicate presence/absence of hotword
-                :rtype: Boolean
+				:type fileName: str
+				:returns: True/False to indicate presence/absence of hotword
+				:rtype: Boolean
 
 		"""
 		distances = np.array(self.distance(fileName))
