@@ -48,11 +48,11 @@ class wordRecorder:
 
 		"""
 		maxShort = 16384
-		scale = float(maxShort)/max(abs(i) for i in data)
+		scale = float(maxShort)/max(abs(i-127) for i in data)
 
-		r = array('h')
+		r = []
 		for i in data:
-			r.append(int(i*scale))
+			r.append(int((i-127)*scale))
 		return r
 
 	def trimWord(self, data):
@@ -103,6 +103,11 @@ class wordRecorder:
 					data += buff
 			except KeyboardInterrupt:
 				print("Interrupted by the user")
+				norm = self.normalize(data)
+				print(min(data))
+				print(max(data))
+				print(min(norm))
+				print(max(norm))
 				return stream.samplesize, data
 
 	def record2File(self, path):
