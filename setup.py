@@ -12,6 +12,6 @@ setup(name='hotword_detection',
         "numpy",
         "scipy",
         "wave",
-        "pyaudio",
+        "sounddevice",
       ],
 )
