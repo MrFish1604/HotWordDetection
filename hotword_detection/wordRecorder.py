@@ -103,11 +103,7 @@ class wordRecorder:
 					data += buff
 			except KeyboardInterrupt:
 				print("Interrupted by the user")
-				norm = self.normalize(data)
-				print(min(data))
-				print(max(data))
-				print(min(norm))
-				print(max(norm))
+				# self.normalize(data)
 				return stream.samplesize, data
 
 	def record2File(self, path):

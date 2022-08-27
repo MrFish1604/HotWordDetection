@@ -7,8 +7,8 @@
 import numpy as np
 import os
 import scipy.io.wavfile as wv
-import mfcc
-import dtw
+from hotword_detection import mfcc
+from hotword_detection import dtw
 
 class hwDetector:
 	"""
