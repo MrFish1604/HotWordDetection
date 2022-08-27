@@ -1,14 +1,15 @@
-"""This module is used for recording speech utterances both for training as well as testing purposes. PyAudio is required for this module."""
-import pyaudio
+"""This module is used for recording speech utterances both for training as well as testing purposes. SoundDevice is required for this module."""
+import sounddevice as sd
 from array import array
 import wave,sys
 from struct import pack
+
 class wordRecorder:
 	"""
 
 	This class contains methods for recording audio from a microphone, segmenting audio to remove noise by using an amplitude based VAD and for storing segmented utterances in an appropriate folder.
 
-	:param samplingFrequency: Frequency at which we want to sample audio
+	:param blockSize: int
 	:type samplingFrequency: int
 	:param threshold: Threshold used for amplitude based VAD (scaled in the range 0-16384)
 	:type threshold: int
@@ -16,9 +17,11 @@ class wordRecorder:
 	Documentation related to all member functions is listed below.
 
 	"""
-	def __init__(self, samplingFrequency = 8000, threshold = 14000):
-		self.samplingFrequency = samplingFrequency
+	def __init__(self, blocksize = 8000, threshold = 14000):
 		self.threshold = threshold
+		self.device_info = sd.query_devices(None, "input")
+		self.samplerate = int(self.device_info["default_samplerate"])
+		self.blocksize = blocksize
 	
 	def isSilent(self, data):
 		"""
@@ -85,32 +88,22 @@ class wordRecorder:
 	def record(self):
 		"""
 
-		This function implements the recording routine used for getting audio from a microphone using PyAudio. It also calls the ``normalize()`` and ``trimWord()`` methods to return the normalized and trimmed audio containing speech only.
+		This function implements the recording routine used for getting audio from a microphone using SoundDevice. It also calls the ``normalize()`` and ``trimWord()`` methods to return the normalized and trimmed audio containing speech only.
 
 		:returns: Trimmed and normalized recorded audio
 		:rtype: array
 
 		"""
-		p = pyaudio.PyAudio()
-		stream = p.open(format=pyaudio.paInt16, channels=1, rate=self.samplingFrequency, input=True, output=False, frames_per_buffer=1024)
-
-		num_silent = 0
-		snd_started = False
-		
-		r = array('h')
-
-		for i in range(int(self.samplingFrequency*2/1024)):
-				snd_data = array('h', stream.read(1024))
-				r.extend(snd_data)
-		
-		sample_width = p.get_sample_size(pyaudio.paInt16)
-		stream.stop_stream()
-		stream.close()
-		p.terminate()
-
-		r = self.normalize(r)
-		r = self.trimWord(r)
-		return sample_width, r
+		with sd.RawInputStream(self.samplerate, self.blocksize, 9, 1, dtype="int16") as stream:
+			data = bytearray()
+			try:
+				print("The program is recording... (Press Ctrl+C to stop)")
+				while True:
+					buff = stream.read(1)[0]
+					data += buff
+			except KeyboardInterrupt:
+				print("Interrupted by the user")
+				return stream.samplesize, data
 
 	def record2File(self, path):
 		"""
@@ -122,12 +115,9 @@ class wordRecorder:
 				
 		"""
 		sample_width, data = self.record()
-		data = pack('<' + ('h'*len(data)), *data)
-
-		wf = wave.open(path, 'wb')
-		wf.setnchannels(1)
-		wf.setsampwidth(sample_width)
-		wf.setframerate(self.samplingFrequency)
-		wf.writeframes(data)
-		wf.close()
+		with wave.open(path, "wb") as wf:
+			wf.setnchannels(1)
+			wf.setsampwidth(sample_width)
+			wf.setframerate(self.samplerate)
+			wf.writeframes(data)
 

@@ -1,7 +1,7 @@
 from setuptools import setup #enables develop
 
 setup(name='hotword_detection',
-      version='1.2.1',
+      version='1.3',
       description='Python Hotword Detection',
       author='Prakhar Swarup, Saketh Sharma, Hitesh Tulsiani',
       license='IITB',
